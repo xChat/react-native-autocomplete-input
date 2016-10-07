@@ -39,11 +39,7 @@ class AutoComplete extends Component {
      * `onShowResults` will be called when list is going to
      * show/hide results.
      */
-    onShowResults: PropTypes.func,
-    /**
-     * renders custom TextInput. All props passed to this function.
-     */
-    renderTextInput: PropTypes.func
+    onShowResults: PropTypes.func
   };
 
   static defaultProps = {
@@ -87,12 +83,14 @@ class AutoComplete extends Component {
     const { listStyle, renderItem } = this.props;
     const { dataSource } = this.state;
     return (
-      <ListView
-        dataSource={dataSource}
-        keyboardShouldPersistTaps={true}
-        renderRow={renderItem}
-        style={[styles.list, listStyle]}
-      />
+      <View style={styles.listViewContainer}>
+        <ListView
+          dataSource={dataSource}
+          keyboardShouldPersistTaps={true}
+          renderRow={renderItem}
+          style={[styles.list, listStyle]}
+        />
+      </View>
     );
   }
 
@@ -109,28 +107,20 @@ class AutoComplete extends Component {
     }
   }
 
-  _renderTextInput() {
-    const { onEndEditing, renderTextInput, style } = this.props;
-    const props = {
-      style: [styles.input, style],
-      ref: ref => (this.textInput = ref),
-      onEndEditing: e =>
-        this._showResults(false) || (onEndEditing && onEndEditing(e)),
-      ...this.props
-    };
-
-    return renderTextInput
-      ? renderTextInput(props)
-      : (<TextInput {...props} />);
-  }
-
   render() {
     const { showResults } = this.state;
-    const { containerStyle, inputContainerStyle } = this.props;
+    const { containerStyle, inputContainerStyle, onEndEditing, style, ...props } = this.props;
     return (
       <View style={[styles.container, containerStyle]}>
         <View style={[styles.inputContainer, inputContainerStyle]}>
-          {this._renderTextInput()}
+          <TextInput
+            style={[styles.input, style]}
+            ref={ref => (this.textInput = ref)}
+            onEndEditing={e =>
+              this._showResults(false) || (onEndEditing && onEndEditing(e))
+            }
+            {...props}
+          />
         </View>
         {showResults && this._renderItems()}
       </View>
@@ -146,23 +136,30 @@ const border = {
 
 const styles = StyleSheet.create({
   container: {
-    zIndex: 1
+    flex: 1,
   },
   inputContainer: {
-    ...border
+    ...border,
+    margin: 10,
+    marginBottom: 0
   },
   input: {
     backgroundColor: 'white',
     height: 40,
     paddingLeft: 3
   },
-  list: {
+  listViewContainer: {
     ...border,
+    marginLeft: 10,
+    marginRight: 10,
+    paddingBottom: 0,
+  },
+  list: {
     backgroundColor: 'white',
     borderTopWidth: 0,
-    left: 0,
-    position: 'absolute',
-    right: 0
+    margin: 10,
+    marginTop: 0,
+    marginBottom: 4,
   }
 });
 
